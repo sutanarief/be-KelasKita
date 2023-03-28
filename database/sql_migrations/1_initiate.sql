@@ -1,0 +1,53 @@
+-- +migrate Up
+-- +StatementBegin
+
+CREATE TABLE account (
+  id SERIAL PRIMARY KEY,
+  full_name VARCHAR(256),
+  username VARCHAR(256),
+  password VARCHAR(256),
+  email VARCHAR(256),
+  role VARCHAR(10),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  class_id INT
+);
+
+CREATE TABLE class (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(10),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  teacher_id INT
+);
+
+CREATE TABLE subject (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(50),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+);
+
+CREATE TABLE question (
+  id SERIAL PRIMARY KEY,
+  title VARCHAR(50),
+  description VARCHAR(1000),
+  user_role VARCHAR(10),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  class_id INT,
+  user_id INT,
+  subject_id INT
+);
+
+CREATE TABLE answer (
+  id SERIAL PRIMARY KEY,
+  answer VARCHAR(100),
+  user_role VARCHAR(10),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+  task_id INT,
+  user_id INT
+);
+
+-- +migrate StatementEnd
