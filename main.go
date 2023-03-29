@@ -70,5 +70,24 @@ func main() {
 	router.PUT("/classes/:id", classHandler.UpdateClass)
 	router.DELETE("/classes/:id", classHandler.DeleteClass)
 	router.GET("/classes/:id/users", classHandler.GetUserByClassId)
+
+	// subject Route
+	subjectRepository := repository.NewSubjectRepository(DB)
+	subjectService := service.NewSubjectService(subjectRepository)
+	subjectHandler := controller.NewSubjectHandler(subjectService)
+	router.GET("/subjects", subjectHandler.GetSubject)
+	router.POST("/subjects", subjectHandler.InsertSubject)
+	router.PUT("/subjects/:id", subjectHandler.UpdateSubject)
+	router.DELETE("/subjects/:id", subjectHandler.DeleteSubject)
+
+	// question Route
+	questionRepository := repository.NewQuestionRepository(DB)
+	questionService := service.NewQuestionService(questionRepository)
+	questionHandler := controller.NewQuestionHandler(questionService)
+	router.GET("/questions", questionHandler.GetQuestion)
+	router.POST("/questions", questionHandler.InsertQuestion)
+	router.PUT("/questions/:id", questionHandler.UpdateQuestion)
+	router.DELETE("/questions/:id", questionHandler.DeleteQuestion)
+
 	router.Run(":8080")
 }
