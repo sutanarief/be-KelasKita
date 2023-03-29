@@ -15,6 +15,7 @@ type UserRepository interface {
 	InsertUser(inputUser entity.User) (entity.User, error)
 	UpdateUser(inputUser entity.User) (entity.User, error)
 	DeleteUser(user entity.User) error
+	GetUserById(id int) (entity.User, error)
 }
 
 type userRepository struct {
@@ -148,4 +149,26 @@ func (u *userRepository) DeleteUser(user entity.User) error {
 	}
 
 	return nil
+}
+
+func (u *userRepository) GetUserById(id int) (entity.User, error) {
+	var result entity.User
+	sql := "SELECT * FROM account WHERE id = $1"
+	errQuery := u.db.QueryRow(sql, id).Scan(
+		&result.ID,
+		&result.Full_name,
+		&result.Username,
+		&result.Password,
+		&result.Email,
+		&result.Role,
+		&result.Created_at,
+		&result.Updated_at,
+		&result.Class_ID,
+	)
+
+	if errQuery != nil {
+		return result, errQuery
+	}
+
+	return result, nil
 }

@@ -11,6 +11,7 @@ type UserService interface {
 	InsertUser(inputUser entity.User) (entity.User, error)
 	UpdateUser(inputUser entity.User, id int) (entity.User, error)
 	DeleteUser(id int) error
+	GetUserById(id int) (entity.User, error)
 }
 
 type userService struct {
@@ -81,4 +82,14 @@ func (u *userService) DeleteUser(id int) error {
 		return err
 	}
 	return nil
+}
+
+func (u *userService) GetUserById(id int) (entity.User, error) {
+	user, err := u.userRepository.GetUserById(id)
+
+	if err != nil {
+		return user, err
+	}
+
+	return user, nil
 }
