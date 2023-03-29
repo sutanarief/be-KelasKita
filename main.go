@@ -59,5 +59,6 @@ func main() {
 	userHandler := controller.NewUserHandler(userService)
 	router.GET("/users", userHandler.GetUser)
 	router.POST("/users", userHandler.InsertUser)
+	router.PUT("/users/:id", userHandler.UpdateUser)
 	router.Run(":8080")
 }

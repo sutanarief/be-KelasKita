@@ -3,13 +3,17 @@ package repository
 import (
 	"be-kelaskita/entity"
 	"database/sql"
+	"fmt"
 	"log"
+	"reflect"
+	"strconv"
+	"strings"
 )
 
 type UserRepository interface {
 	GetUser() ([]entity.User, error)
 	InsertUser(inputUser entity.User) (entity.User, error)
-	// UpdateUser(inputUser entity.User, id int) (entity.User, error)
+	UpdateUser(inputUser entity.User) (entity.User, error)
 	// DeleteUser(id int) error
 }
 
@@ -38,14 +42,14 @@ func (u *userRepository) GetUser() ([]entity.User, error) {
 
 		err := data.Scan(
 			&user.ID,
-			&user.FullName,
+			&user.Full_name,
 			&user.Username,
 			&user.Password,
 			&user.Email,
 			&user.Role,
-			&user.CreatedAt,
-			&user.UpdatedAt,
-			&user.ClassID,
+			&user.Created_at,
+			&user.Updated_at,
+			&user.Class_ID,
 		)
 
 		if err != nil {
@@ -66,29 +70,70 @@ func (u *userRepository) InsertUser(user entity.User) (entity.User, error) {
 
 	err := u.db.QueryRow(
 		sql,
-		user.FullName,
+		user.Full_name,
 		user.Username,
 		user.Password,
 		user.Email,
 		user.Role,
-		user.CreatedAt,
-		user.UpdatedAt,
-		user.ClassID,
+		user.Created_at,
+		user.Updated_at,
+		user.Class_ID,
 	).Scan(
 		&user.ID,
-		&user.FullName,
+		&user.Full_name,
 		&user.Username,
 		&user.Password,
 		&user.Email,
 		&user.Role,
-		&user.CreatedAt,
-		&user.UpdatedAt,
-		&user.ClassID,
+		&user.Created_at,
+		&user.Updated_at,
+		&user.Class_ID,
 	)
 
 	if err != nil {
 		return user, err
 	}
 
+	return user, nil
+}
+
+func (u *userRepository) UpdateUser(user entity.User) (entity.User, error) {
+	sql := "UPDATE account SET "
+	inputUserValue := reflect.ValueOf(user)
+	types := inputUserValue.Type()
+	index := 1
+	var datas []interface{}
+
+	for i := 0; i < inputUserValue.NumField(); i++ {
+		if types.Field(i).Name != "Created_at" && types.Field(i).Name != "ID" {
+			if !inputUserValue.Field(i).IsZero() {
+				sql += fmt.Sprintf("%v = %v, ", strings.ToLower(types.Field(i).Name), "$"+strconv.Itoa(index))
+				datas = append(datas, inputUserValue.Field(i).Interface())
+				index++
+			}
+		}
+	}
+	sql = strings.TrimSuffix(sql, ", ")
+	datas = append(datas, user.ID)
+	sql += " WHERE id = $" + strconv.Itoa(len(datas)) + " RETURNING *"
+
+	err := u.db.QueryRow(
+		sql,
+		datas...,
+	).Scan(
+		&user.ID,
+		&user.Full_name,
+		&user.Username,
+		&user.Password,
+		&user.Email,
+		&user.Role,
+		&user.Created_at,
+		&user.Updated_at,
+		&user.Class_ID,
+	)
+
+	if err != nil {
+		return user, err
+	}
 	return user, nil
 }

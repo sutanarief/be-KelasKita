@@ -4,6 +4,7 @@ import (
 	"be-kelaskita/entity"
 	"be-kelaskita/service"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -50,5 +51,31 @@ func (u *userHandler) InsertUser(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "Success Insert User",
 		"result":  newUser,
+	})
+}
+
+func (u *userHandler) UpdateUser(c *gin.Context) {
+	var inputUser entity.User
+	id, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		panic(err)
+	}
+
+	err = c.ShouldBindJSON(&inputUser)
+
+	if err != nil {
+		panic(err)
+	}
+
+	user, err := u.userService.UpdateUser(inputUser, id)
+
+	if err != nil {
+		panic(err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Success Update User",
+		"result":  user,
 	})
 }

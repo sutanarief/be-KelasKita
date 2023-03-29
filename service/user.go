@@ -9,7 +9,7 @@ import (
 type UserService interface {
 	GetUser() ([]entity.User, error)
 	InsertUser(inputUser entity.User) (entity.User, error)
-	// UpdateUser(inputUser entity.User, id int) (entity.User, error)
+	UpdateUser(inputUser entity.User, id int) (entity.User, error)
 	// DeleteUser(id int) error
 }
 
@@ -34,16 +34,37 @@ func (u *userService) GetUser() ([]entity.User, error) {
 func (u *userService) InsertUser(inputUser entity.User) (entity.User, error) {
 	var user entity.User
 
-	user.FullName = inputUser.FullName
+	user.Full_name = inputUser.Full_name
 	user.Username = inputUser.Username
 	user.Password = inputUser.Password
 	user.Email = inputUser.Email
 	user.Role = inputUser.Role
-	user.CreatedAt = time.Now()
-	user.UpdatedAt = time.Now()
-	user.ClassID = inputUser.ClassID
+	user.Created_at = time.Now()
+	user.Updated_at = time.Now()
+	user.Class_ID = inputUser.Class_ID
 
 	newUser, err := u.userRepository.InsertUser(user)
+	if err != nil {
+		return newUser, err
+	}
+
+	return newUser, nil
+}
+
+func (u *userService) UpdateUser(inputUser entity.User, id int) (entity.User, error) {
+	var user entity.User
+
+	user.ID = id
+
+	user.Full_name = inputUser.Full_name
+	user.Username = inputUser.Username
+	user.Password = inputUser.Password
+	user.Email = inputUser.Email
+	user.Class_ID = inputUser.Class_ID
+
+	user.Updated_at = time.Now()
+
+	newUser, err := u.userRepository.UpdateUser(user)
 	if err != nil {
 		return newUser, err
 	}
