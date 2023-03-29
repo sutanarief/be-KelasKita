@@ -14,7 +14,7 @@ type UserRepository interface {
 	GetUser() ([]entity.User, error)
 	InsertUser(inputUser entity.User) (entity.User, error)
 	UpdateUser(inputUser entity.User) (entity.User, error)
-	// DeleteUser(id int) error
+	DeleteUser(user entity.User) error
 }
 
 type userRepository struct {
@@ -113,6 +113,7 @@ func (u *userRepository) UpdateUser(user entity.User) (entity.User, error) {
 			}
 		}
 	}
+
 	sql = strings.TrimSuffix(sql, ", ")
 	datas = append(datas, user.ID)
 	sql += " WHERE id = $" + strconv.Itoa(len(datas)) + " RETURNING *"
@@ -136,4 +137,15 @@ func (u *userRepository) UpdateUser(user entity.User) (entity.User, error) {
 		return user, err
 	}
 	return user, nil
+}
+
+func (u *userRepository) DeleteUser(user entity.User) error {
+	sql := "DELETE FROM account WHERE id = $1"
+	err := u.db.QueryRow(sql, user.ID)
+
+	if err != nil {
+		return err.Err()
+	}
+
+	return nil
 }

@@ -36,9 +36,7 @@ func main() {
 		os.Getenv("PGPASSWORD"),
 		os.Getenv("PGDATABASE"),
 	)
-	fmt.Println(psqlInfo)
 	DB, err = sql.Open("postgres", psqlInfo)
-	fmt.Println(DB)
 
 	err = DB.Ping()
 
@@ -60,5 +58,6 @@ func main() {
 	router.GET("/users", userHandler.GetUser)
 	router.POST("/users", userHandler.InsertUser)
 	router.PUT("/users/:id", userHandler.UpdateUser)
+	router.DELETE("/users/:id", userHandler.DeleteUser)
 	router.Run(":8080")
 }

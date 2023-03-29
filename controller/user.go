@@ -79,3 +79,19 @@ func (u *userHandler) UpdateUser(c *gin.Context) {
 		"result":  user,
 	})
 }
+
+func (u *userHandler) DeleteUser(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		panic(err)
+	}
+
+	err = u.userService.DeleteUser(id)
+	if err != nil {
+		panic(err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"result": "Success Delete User",
+	})
+}
