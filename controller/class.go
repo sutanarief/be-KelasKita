@@ -54,6 +54,48 @@ func (cl *classHandler) InsertClass(c *gin.Context) {
 	})
 }
 
+func (cl *classHandler) UpdateClass(c *gin.Context) {
+	var inputClass entity.Class
+	id, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		panic(err)
+	}
+
+	err = c.ShouldBindJSON(&inputClass)
+
+	if err != nil {
+		panic(err)
+	}
+
+	class, err := cl.classService.UpdateClass(inputClass, id)
+
+	if err != nil {
+		panic(err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Success Update Class",
+		"result":  class,
+	})
+}
+
+func (cl *classHandler) DeleteClass(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		panic(err)
+	}
+
+	err = cl.classService.DeleteClass(id)
+	if err != nil {
+		panic(err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"result": "Success Delete Class",
+	})
+}
+
 func (cl *classHandler) GetUserByClassId(c *gin.Context) {
 	var result gin.H
 	id, err := strconv.Atoi(c.Param("id"))

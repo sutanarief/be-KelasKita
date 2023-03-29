@@ -9,8 +9,8 @@ import (
 type ClassService interface {
 	GetClass() ([]entity.Class, error)
 	InsertClass(inputUser entity.Class) (entity.Class, error)
-	// UpdateClass(inputUser entity.Class, id int) (entity.Class, error)
-	// DeleteClass(id int) error
+	UpdateClass(inputUser entity.Class, id int) (entity.Class, error)
+	DeleteClass(id int) error
 	GetUserByClassId(id int) ([]entity.User, error)
 }
 
@@ -35,7 +35,7 @@ func (c *classService) InsertClass(inputClass entity.Class) (entity.Class, error
 
 	class.Name = inputClass.Name
 	class.Created_at = time.Now()
-	class.Update_at = time.Now()
+	class.Updated_at = time.Now()
 	class.Teacher_id = inputClass.Teacher_id
 
 	newClass, err := c.classRepository.InsertClass(class)
@@ -45,6 +45,35 @@ func (c *classService) InsertClass(inputClass entity.Class) (entity.Class, error
 	}
 
 	return newClass, nil
+}
+
+func (c *classService) UpdateClass(inputClass entity.Class, id int) (entity.Class, error) {
+	var class entity.Class
+
+	class.ID = id
+
+	class.Name = inputClass.Name
+	class.Teacher_id = inputClass.Teacher_id
+
+	class.Updated_at = time.Now()
+
+	updatedClass, err := c.classRepository.UpdateClass(class)
+	if err != nil {
+		return updatedClass, err
+	}
+
+	return updatedClass, nil
+}
+
+func (c *classService) DeleteClass(id int) error {
+	var class entity.Class
+
+	class.ID = id
+	err := c.classRepository.DeleteClass(class)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (c *classService) GetUserByClassId(id int) ([]entity.User, error) {

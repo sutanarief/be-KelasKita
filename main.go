@@ -67,6 +67,8 @@ func main() {
 	classHandler := controller.NewClassHandler(classService)
 	router.GET("/classes", classHandler.GetClass)
 	router.POST("/classes", classHandler.InsertClass)
+	router.PUT("/classes/:id", classHandler.UpdateClass)
+	router.DELETE("/classes/:id", classHandler.DeleteClass)
 	router.GET("/classes/:id/users", classHandler.GetUserByClassId)
 	router.Run(":8080")
 }

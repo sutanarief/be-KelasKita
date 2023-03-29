@@ -65,12 +65,12 @@ func (u *userService) UpdateUser(inputUser entity.User, id int) (entity.User, er
 
 	user.Updated_at = time.Now()
 
-	newUser, err := u.userRepository.UpdateUser(user)
+	updatedUser, err := u.userRepository.UpdateUser(user)
 	if err != nil {
-		return newUser, err
+		return updatedUser, err
 	}
 
-	return newUser, nil
+	return updatedUser, nil
 }
 
 func (u *userService) DeleteUser(id int) error {

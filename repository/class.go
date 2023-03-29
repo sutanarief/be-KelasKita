@@ -3,13 +3,17 @@ package repository
 import (
 	"be-kelaskita/entity"
 	"database/sql"
+	"fmt"
+	"reflect"
+	"strconv"
+	"strings"
 )
 
 type ClassRepository interface {
 	GetClass() ([]entity.Class, error)
 	InsertClass(inputClass entity.Class) (entity.Class, error)
-	// UpdateClass(inputclass entity.Class) (entity.Class, error)
-	// Deleteclass(class entity.Class) error
+	UpdateClass(inputclass entity.Class) (entity.Class, error)
+	DeleteClass(class entity.Class) error
 	GetUserByClassId(class entity.Class) ([]entity.User, error)
 }
 
@@ -38,7 +42,7 @@ func (c *classRepository) GetClass() ([]entity.Class, error) {
 			&class.ID,
 			&class.Name,
 			&class.Created_at,
-			&class.Update_at,
+			&class.Updated_at,
 			&class.Teacher_id,
 		)
 
@@ -68,7 +72,7 @@ func (u *classRepository) InsertClass(class entity.Class) (entity.Class, error) 
 		&class.ID,
 		&class.Name,
 		&class.Created_at,
-		&class.Update_at,
+		&class.Updated_at,
 		&class.Teacher_id,
 	)
 
@@ -77,6 +81,55 @@ func (u *classRepository) InsertClass(class entity.Class) (entity.Class, error) 
 	}
 
 	return class, nil
+}
+
+func (c *classRepository) UpdateClass(class entity.Class) (entity.Class, error) {
+	sql := "UPDATE class SET "
+	inputUserValue := reflect.ValueOf(class)
+	types := inputUserValue.Type()
+	index := 1
+	var datas []interface{}
+
+	for i := 0; i < inputUserValue.NumField(); i++ {
+		if types.Field(i).Name != "Created_at" && types.Field(i).Name != "ID" {
+			if !inputUserValue.Field(i).IsZero() {
+				sql += fmt.Sprintf("%v = %v, ", strings.ToLower(types.Field(i).Name), "$"+strconv.Itoa(index))
+				datas = append(datas, inputUserValue.Field(i).Interface())
+				index++
+			}
+		}
+	}
+
+	sql = strings.TrimSuffix(sql, ", ")
+	datas = append(datas, class.ID)
+	sql += " WHERE id = $" + strconv.Itoa(len(datas)) + " RETURNING *"
+
+	err := c.db.QueryRow(
+		sql,
+		datas...,
+	).Scan(
+		&class.ID,
+		&class.Name,
+		&class.Created_at,
+		&class.Updated_at,
+		&class.Teacher_id,
+	)
+
+	if err != nil {
+		return class, err
+	}
+	return class, nil
+}
+
+func (c *classRepository) DeleteClass(class entity.Class) error {
+	sql := "DELETE FROM class WHERE id = $1"
+	err := c.db.QueryRow(sql, class.ID)
+
+	if err != nil {
+		return err.Err()
+	}
+
+	return nil
 }
 
 func (c *classRepository) GetUserByClassId(class entity.Class) ([]entity.User, error) {
