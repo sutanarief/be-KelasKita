@@ -16,6 +16,7 @@ type UserRepository interface {
 	UpdateUser(inputUser entity.User) (entity.User, error)
 	DeleteUser(user entity.User) error
 	GetUserById(id int) (entity.User, error)
+	UserLogin(email string, username string) (entity.User, error)
 }
 
 type userRepository struct {
@@ -154,7 +155,7 @@ func (u *userRepository) DeleteUser(user entity.User) error {
 func (u *userRepository) GetUserById(id int) (entity.User, error) {
 	var result entity.User
 	sql := "SELECT * FROM account WHERE id = $1"
-	errQuery := u.db.QueryRow(sql, id).Scan(
+	err := u.db.QueryRow(sql, id).Scan(
 		&result.ID,
 		&result.Full_name,
 		&result.Username,
@@ -166,8 +167,34 @@ func (u *userRepository) GetUserById(id int) (entity.User, error) {
 		&result.Class_ID,
 	)
 
-	if errQuery != nil {
-		return result, errQuery
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
+}
+
+func (u *userRepository) UserLogin(email string, username string) (entity.User, error) {
+	var result entity.User
+	sql := "SELECT * FROM account WHERE email = $1 OR username = $2"
+	err := u.db.QueryRow(
+		sql,
+		email,
+		username,
+	).Scan(
+		&result.ID,
+		&result.Full_name,
+		&result.Username,
+		&result.Password,
+		&result.Email,
+		&result.Role,
+		&result.Created_at,
+		&result.Updated_at,
+		&result.Class_ID,
+	)
+
+	if err != nil {
+		return result, err
 	}
 
 	return result, nil

@@ -3,6 +3,7 @@ package main
 import (
 	"be-kelaskita/controller"
 	"be-kelaskita/database"
+	"be-kelaskita/middleware"
 	"be-kelaskita/repository"
 	"be-kelaskita/service"
 	"database/sql"
@@ -51,43 +52,47 @@ func main() {
 
 	defer DB.Close()
 
+	authorized := router.Group("/")
+	authorized.Use(middleware.Auth(DB))
 	// user Route
 	userRepository := repository.NewUserRepository(DB)
 	userService := service.NewUserService(userRepository)
 	userHandler := controller.NewUserHandler(userService)
-	router.GET("/users", userHandler.GetUser)
-	router.POST("/users", userHandler.InsertUser)
-	router.PUT("/users/:id", userHandler.UpdateUser)
-	router.DELETE("/users/:id", userHandler.DeleteUser)
-	router.GET("/user/:id", userHandler.GetUserById)
+	authorized.GET("/user", userHandler.GetUser)
+	authorized.PUT("/user/:id", userHandler.UpdateUser)
+	authorized.DELETE("/user/:id", userHandler.DeleteUser)
+	authorized.GET("/user/:id", userHandler.GetUserById)
+	router.POST("/user/register", userHandler.InsertUser)
+	router.POST("/user/login", userHandler.UserLogin)
 
 	// class Route
 	classRepository := repository.NewClassRepository(DB)
 	classService := service.NewClassService(classRepository)
 	classHandler := controller.NewClassHandler(classService)
-	router.GET("/classes", classHandler.GetClass)
-	router.POST("/classes", classHandler.InsertClass)
-	router.PUT("/classes/:id", classHandler.UpdateClass)
-	router.DELETE("/classes/:id", classHandler.DeleteClass)
-	router.GET("/classes/:id/users", classHandler.GetUserByClassId)
+	router.GET("/class", classHandler.GetClass)
+	authorized.POST("/class", classHandler.InsertClass)
+	authorized.PUT("/class/:id", classHandler.UpdateClass)
+	authorized.DELETE("/class/:id", classHandler.DeleteClass)
+	authorized.GET("/class/:id/users", classHandler.GetUserByClassId)
 
 	// subject Route
 	subjectRepository := repository.NewSubjectRepository(DB)
 	subjectService := service.NewSubjectService(subjectRepository)
 	subjectHandler := controller.NewSubjectHandler(subjectService)
-	router.GET("/subjects", subjectHandler.GetSubject)
-	router.POST("/subjects", subjectHandler.InsertSubject)
-	router.PUT("/subjects/:id", subjectHandler.UpdateSubject)
-	router.DELETE("/subjects/:id", subjectHandler.DeleteSubject)
+	router.GET("/subject", subjectHandler.GetSubject)
+	authorized.POST("/subject", subjectHandler.InsertSubject)
+	authorized.PUT("/subject/:id", subjectHandler.UpdateSubject)
+	authorized.DELETE("/subject/:id", subjectHandler.DeleteSubject)
 
 	// question Route
 	questionRepository := repository.NewQuestionRepository(DB)
 	questionService := service.NewQuestionService(questionRepository)
 	questionHandler := controller.NewQuestionHandler(questionService)
-	router.GET("/questions", questionHandler.GetQuestion)
-	router.POST("/questions", questionHandler.InsertQuestion)
-	router.PUT("/questions/:id", questionHandler.UpdateQuestion)
-	router.DELETE("/questions/:id", questionHandler.DeleteQuestion)
+	router.GET("/question", questionHandler.GetQuestion)
+	authorized.POST("/question", questionHandler.InsertQuestion)
+	authorized.PUT("/question/:id", questionHandler.UpdateQuestion)
+	authorized.DELETE("/question/:id", questionHandler.DeleteQuestion)
+	router.GET("/question/:id", questionHandler.GetQuestionById)
 
 	router.Run(":8080")
 }

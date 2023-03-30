@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"be-kelaskita/auth"
 	"be-kelaskita/entity"
 	"be-kelaskita/service"
 	"net/http"
@@ -39,6 +40,11 @@ func (u *userHandler) InsertUser(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&inputUser)
 	if err != nil {
+		panic(err)
+	}
+
+	errHash := inputUser.HashPassword(inputUser.Password)
+	if errHash != nil {
 		panic(err)
 	}
 
@@ -111,4 +117,36 @@ func (u *userHandler) GetUserById(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"result": user,
 	})
+}
+
+func (u *userHandler) UserLogin(c *gin.Context) {
+	var inputUser entity.User
+
+	err := c.ShouldBindJSON(&inputUser)
+	if err != nil {
+		panic(err)
+	}
+
+	user, err := u.userService.UserLogin(inputUser.Email, inputUser.Username)
+	if err != nil {
+		panic(err)
+	}
+
+	credentialError := user.CheckPassword(inputUser.Password)
+
+	if credentialError != nil {
+		panic(err)
+	}
+
+	tokenString, err := auth.GenerateJWT(user.Email, user.Username, user.Role, user.ID)
+
+	if err != nil {
+		panic(err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Login Success",
+		"token":   tokenString,
+	})
+
 }

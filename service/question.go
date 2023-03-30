@@ -11,6 +11,7 @@ type QuestionService interface {
 	InsertQuestion(inputQuestion entity.Question) (entity.Question, error)
 	UpdateQuestion(inputQuestion entity.Question, id int) (entity.Question, error)
 	DeleteQuestion(id int) error
+	GetQuestionById(id int) (entity.Question, error)
 }
 
 type questionService struct {
@@ -82,4 +83,14 @@ func (q *questionService) DeleteQuestion(id int) error {
 		return err
 	}
 	return nil
+}
+
+func (q *questionService) GetQuestionById(id int) (entity.Question, error) {
+	question, err := q.questionRepository.GetQuestionById(id)
+
+	if err != nil {
+		return question, err
+	}
+
+	return question, nil
 }

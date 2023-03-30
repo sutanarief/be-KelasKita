@@ -14,6 +14,7 @@ type QuestionRepository interface {
 	InsertQuestion(inputQuestion entity.Question) (entity.Question, error)
 	UpdateQuestion(inputQuestion entity.Question) (entity.Question, error)
 	DeleteQuestion(question entity.Question) error
+	GetQuestionById(id int) (entity.Question, error)
 }
 
 type questionRepository struct {
@@ -145,4 +146,26 @@ func (q *questionRepository) DeleteQuestion(question entity.Question) error {
 	}
 
 	return nil
+}
+
+func (q *questionRepository) GetQuestionById(id int) (entity.Question, error) {
+	var result entity.Question
+	sql := "SELECT * FROM question WHERE id = $1"
+	err := q.db.QueryRow(sql, id).Scan(
+		&result.ID,
+		&result.Title,
+		&result.Description,
+		&result.User_role,
+		&result.Created_at,
+		&result.Updated_at,
+		&result.Class_id,
+		&result.User_id,
+		&result.Subject_id,
+	)
+
+	if err != nil {
+		return result, err
+	}
+
+	return result, nil
 }

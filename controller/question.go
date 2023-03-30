@@ -95,3 +95,19 @@ func (q *questionHandler) DeleteQuestion(c *gin.Context) {
 		"result": "Success Delete Question",
 	})
 }
+
+func (q *questionHandler) GetQuestionById(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		panic(err)
+	}
+
+	question, err := q.questionService.GetQuestionById(id)
+	if err != nil {
+		panic(err)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"result": question,
+	})
+}
