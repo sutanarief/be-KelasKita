@@ -6,12 +6,15 @@ import (
 	"be-kelaskita/service"
 	"database/sql"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
+
+var jwtKey = os.Getenv("JWTKEY")
 
 func Auth(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -49,7 +52,7 @@ func acccessValidator(c *gin.Context, tokenString string, db *sql.DB) (string, b
 	path := c.Request.RequestURI
 
 	credential, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {
-		return []byte("secret"), nil
+		return []byte(jwtKey), nil
 	})
 
 	if err != nil {
