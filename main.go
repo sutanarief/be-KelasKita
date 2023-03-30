@@ -108,5 +108,5 @@ func main() {
 	authorized.DELETE("/answer/:id", answerHandler.DeleteAnswer)
 	authorized.GET("/answer/:id", answerHandler.GetAnswerById)
 
-	router.Run(":8080")
+	router.Run(":" + os.Getenv("PORT"))
 }
