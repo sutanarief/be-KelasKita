@@ -88,5 +88,26 @@ func acccessValidator(c *gin.Context, tokenString string, db *sql.DB) (string, b
 		}
 	}
 
+	if strings.Contains(string(path), "answer") {
+		if method == "PUT" || method == "DELETE" {
+			if role != "Teacher" {
+				userId := strconv.FormatFloat(data["id"].(float64), 'f', 0, 64)
+				questionId := c.Param("id")
+				id, err := strconv.Atoi(questionId)
+				if err != nil {
+					panic(err)
+				}
+				answerRepository := repository.NewAnswerRepository(db)
+				answerService := service.NewAnswerService(answerRepository)
+				answer, err := answerService.GetAnswerById(id)
+				answerUserId := strconv.Itoa(answer.User_id)
+
+				if userId != answerUserId {
+					return "As a Student you cannot delete or edit another user's answer", false
+				}
+			}
+		}
+	}
+
 	return "", true
 }

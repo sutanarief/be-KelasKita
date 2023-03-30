@@ -94,5 +94,15 @@ func main() {
 	authorized.DELETE("/question/:id", questionHandler.DeleteQuestion)
 	router.GET("/question/:id", questionHandler.GetQuestionById)
 
+	// answer Route
+	answerRepository := repository.NewAnswerRepository(DB)
+	answerService := service.NewAnswerService(answerRepository)
+	answerHandler := controller.NewAnswerHandler(answerService)
+	router.GET("/answer", answerHandler.GetAnswer)
+	authorized.POST("/answer", answerHandler.InsertAnswer)
+	authorized.PUT("/answer/:id", answerHandler.UpdateAnswer)
+	authorized.DELETE("/answer/:id", answerHandler.DeleteAnswer)
+	router.GET("/answer/:id", answerHandler.GetAnswerById)
+
 	router.Run(":8080")
 }
