@@ -13,6 +13,7 @@ type UserService interface {
 	DeleteUser(id int) error
 	GetUserById(id int) (entity.User, error)
 	UserLogin(email string, username string) (entity.User, error)
+	GetQuestionByUserId(id int) ([]entity.Question, error)
 }
 
 type userService struct {
@@ -104,4 +105,15 @@ func (u *userService) UserLogin(email string, username string) (entity.User, err
 
 	return user, nil
 
+}
+
+func (u *userService) GetQuestionByUserId(id int) ([]entity.Question, error) {
+	var user entity.User
+
+	user.ID = id
+	users, err := u.userRepository.GetQuestionByUserId(user)
+	if err != nil {
+		return users, err
+	}
+	return users, nil
 }

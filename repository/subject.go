@@ -14,6 +14,7 @@ type SubjectRepository interface {
 	InsertSubject(inputSubject entity.Subject) (entity.Subject, error)
 	UpdateSubject(inputSubject entity.Subject) (entity.Subject, error)
 	DeleteSubject(subject entity.Subject) error
+	GetQuestionBySubjectId(subject entity.Subject) ([]entity.Question, error)
 }
 
 type subjectRepository struct {
@@ -24,11 +25,11 @@ func NewSubjectRepository(db *sql.DB) *subjectRepository {
 	return &subjectRepository{db}
 }
 
-func (c *subjectRepository) GetSubject() ([]entity.Subject, error) {
+func (s *subjectRepository) GetSubject() ([]entity.Subject, error) {
 	var result []entity.Subject
 
 	sql := "SELECT * FROM subject"
-	data, err := c.db.Query(sql)
+	data, err := s.db.Query(sql)
 
 	if err != nil {
 		panic(err)
@@ -79,7 +80,7 @@ func (u *subjectRepository) InsertSubject(subject entity.Subject) (entity.Subjec
 	return subject, nil
 }
 
-func (c *subjectRepository) UpdateSubject(subject entity.Subject) (entity.Subject, error) {
+func (s *subjectRepository) UpdateSubject(subject entity.Subject) (entity.Subject, error) {
 	sql := "UPDATE subject SET "
 	inputUserValue := reflect.ValueOf(subject)
 	types := inputUserValue.Type()
@@ -100,7 +101,7 @@ func (c *subjectRepository) UpdateSubject(subject entity.Subject) (entity.Subjec
 	datas = append(datas, subject.ID)
 	sql += " WHERE id = $" + strconv.Itoa(len(datas)) + " RETURNING *"
 
-	err := c.db.QueryRow(
+	err := s.db.QueryRow(
 		sql,
 		datas...,
 	).Scan(
@@ -116,13 +117,47 @@ func (c *subjectRepository) UpdateSubject(subject entity.Subject) (entity.Subjec
 	return subject, nil
 }
 
-func (c *subjectRepository) DeleteSubject(subject entity.Subject) error {
+func (s *subjectRepository) DeleteSubject(subject entity.Subject) error {
 	sql := "DELETE FROM subject WHERE id = $1"
-	err := c.db.QueryRow(sql, subject.ID)
+	err := s.db.QueryRow(sql, subject.ID)
 
 	if err != nil {
 		return err.Err()
 	}
 
 	return nil
+}
+
+func (s *subjectRepository) GetQuestionBySubjectId(subject entity.Subject) ([]entity.Question, error) {
+	var result []entity.Question
+
+	sql := "SELECT * FROM question WHERE subject_id = $1 ORDER BY created_at DESC"
+	data, err := s.db.Query(sql, subject.ID)
+
+	if err != nil {
+		panic(err)
+	}
+
+	for data.Next() {
+		var question entity.Question
+
+		err := data.Scan(
+			&question.ID,
+			&question.Title,
+			&question.Question,
+			&question.Created_at,
+			&question.Updated_at,
+			&question.User_role,
+			&question.Class_id,
+			&question.User_id,
+			&question.Subject_id,
+		)
+
+		if err != nil {
+			panic(err)
+		}
+		result = append(result, question)
+	}
+
+	return result, nil
 }

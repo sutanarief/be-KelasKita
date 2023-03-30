@@ -12,6 +12,7 @@ type ClassService interface {
 	UpdateClass(inputUser entity.Class, id int) (entity.Class, error)
 	DeleteClass(id int) error
 	GetUserByClassId(id int) ([]entity.User, error)
+	GetQuestionByClassId(id int) ([]entity.Question, error)
 }
 
 type classService struct {
@@ -85,4 +86,15 @@ func (c *classService) GetUserByClassId(id int) ([]entity.User, error) {
 		return users, err
 	}
 	return users, nil
+}
+
+func (c *classService) GetQuestionByClassId(id int) ([]entity.Question, error) {
+	var class entity.Class
+
+	class.ID = id
+	questions, err := c.classRepository.GetQuestionByClassId(class)
+	if err != nil {
+		return questions, err
+	}
+	return questions, nil
 }

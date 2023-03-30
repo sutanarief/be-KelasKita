@@ -2,6 +2,7 @@ package controller
 
 import (
 	"be-kelaskita/entity"
+	"be-kelaskita/helper"
 	"be-kelaskita/service"
 	"net/http"
 	"strconv"
@@ -45,7 +46,8 @@ func (s *subjectHandler) InsertSubject(c *gin.Context) {
 	newSubject, err := s.subjectService.InsertSubject(inputSubject)
 
 	if err != nil {
-		panic(err)
+		helper.ErrorHandler(err, c)
+		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
@@ -71,7 +73,8 @@ func (s *subjectHandler) UpdateSubject(c *gin.Context) {
 	subject, err := s.subjectService.UpdateSubject(inputSubject, id)
 
 	if err != nil {
-		panic(err)
+		helper.ErrorHandler(err, c)
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -88,10 +91,30 @@ func (s *subjectHandler) DeleteSubject(c *gin.Context) {
 
 	err = s.subjectService.DeleteSubject(id)
 	if err != nil {
-		panic(err)
+		helper.ErrorHandler(err, c)
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"result": "Success Delete Subject",
 	})
+}
+
+func (s *subjectHandler) GetQuestionBySubjectId(c *gin.Context) {
+	var result gin.H
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		panic(err)
+	}
+
+	questions, err := s.subjectService.GetQuestionBySubjectId(id)
+	if err != nil {
+		panic(err)
+	} else {
+		result = gin.H{
+			"result": questions,
+		}
+	}
+
+	c.JSON(http.StatusOK, result)
 }

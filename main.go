@@ -64,6 +64,7 @@ func main() {
 	authorized.GET("/user/:id", userHandler.GetUserById)
 	router.POST("/user/register", userHandler.InsertUser)
 	router.POST("/user/login", userHandler.UserLogin)
+	authorized.GET("/user/:id/question", userHandler.GetQuestionByUserId)
 
 	// class Route
 	classRepository := repository.NewClassRepository(DB)
@@ -73,7 +74,8 @@ func main() {
 	authorized.POST("/class", classHandler.InsertClass)
 	authorized.PUT("/class/:id", classHandler.UpdateClass)
 	authorized.DELETE("/class/:id", classHandler.DeleteClass)
-	authorized.GET("/class/:id/users", classHandler.GetUserByClassId)
+	authorized.GET("/class/:id/user", classHandler.GetUserByClassId)
+	authorized.GET("/class/:id/question", classHandler.GetQuestionByClassId)
 
 	// subject Route
 	subjectRepository := repository.NewSubjectRepository(DB)
@@ -83,6 +85,7 @@ func main() {
 	authorized.POST("/subject", subjectHandler.InsertSubject)
 	authorized.PUT("/subject/:id", subjectHandler.UpdateSubject)
 	authorized.DELETE("/subject/:id", subjectHandler.DeleteSubject)
+	authorized.GET("/subject/:id/question", subjectHandler.GetQuestionBySubjectId)
 
 	// question Route
 	questionRepository := repository.NewQuestionRepository(DB)
@@ -92,7 +95,8 @@ func main() {
 	authorized.POST("/question", questionHandler.InsertQuestion)
 	authorized.PUT("/question/:id", questionHandler.UpdateQuestion)
 	authorized.DELETE("/question/:id", questionHandler.DeleteQuestion)
-	router.GET("/question/:id", questionHandler.GetQuestionById)
+	authorized.GET("/question/:id", questionHandler.GetQuestionById)
+	authorized.GET("/question/:id/withanswer", questionHandler.GetQuestionWithAnswer)
 
 	// answer Route
 	answerRepository := repository.NewAnswerRepository(DB)
@@ -102,7 +106,7 @@ func main() {
 	authorized.POST("/answer", answerHandler.InsertAnswer)
 	authorized.PUT("/answer/:id", answerHandler.UpdateAnswer)
 	authorized.DELETE("/answer/:id", answerHandler.DeleteAnswer)
-	router.GET("/answer/:id", answerHandler.GetAnswerById)
+	authorized.GET("/answer/:id", answerHandler.GetAnswerById)
 
 	router.Run(":8080")
 }

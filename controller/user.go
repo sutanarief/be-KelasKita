@@ -3,7 +3,9 @@ package controller
 import (
 	"be-kelaskita/auth"
 	"be-kelaskita/entity"
+	"be-kelaskita/helper"
 	"be-kelaskita/service"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -51,7 +53,9 @@ func (u *userHandler) InsertUser(c *gin.Context) {
 	newUser, err := u.userService.InsertUser(inputUser)
 
 	if err != nil {
-		panic(err)
+		helper.ErrorHandler(err, c)
+		return
+
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
@@ -74,10 +78,18 @@ func (u *userHandler) UpdateUser(c *gin.Context) {
 		panic(err)
 	}
 
+	if inputUser.Password != "" {
+		errHash := inputUser.HashPassword(inputUser.Password)
+		if errHash != nil {
+			panic(err)
+		}
+	}
+
 	user, err := u.userService.UpdateUser(inputUser, id)
 
 	if err != nil {
-		panic(err)
+		helper.ErrorHandler(err, c)
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -94,7 +106,8 @@ func (u *userHandler) DeleteUser(c *gin.Context) {
 
 	err = u.userService.DeleteUser(id)
 	if err != nil {
-		panic(err)
+		helper.ErrorHandler(err, c)
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -108,10 +121,10 @@ func (u *userHandler) GetUserById(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-
 	user, err := u.userService.GetUserById(id)
 	if err != nil {
-		panic(err)
+		helper.ErrorHandler(err, c)
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -129,13 +142,15 @@ func (u *userHandler) UserLogin(c *gin.Context) {
 
 	user, err := u.userService.UserLogin(inputUser.Email, inputUser.Username)
 	if err != nil {
-		panic(err)
+		helper.ErrorHandler(errors.New("unregister"), c)
+		return
 	}
 
 	credentialError := user.CheckPassword(inputUser.Password)
 
 	if credentialError != nil {
-		panic(err)
+		helper.ErrorHandler(errors.New("incorrect"), c)
+		return
 	}
 
 	tokenString, err := auth.GenerateJWT(user.Email, user.Username, user.Role, user.ID)
@@ -148,5 +163,23 @@ func (u *userHandler) UserLogin(c *gin.Context) {
 		"message": "Login Success",
 		"token":   tokenString,
 	})
+}
 
+func (u *userHandler) GetQuestionByUserId(c *gin.Context) {
+	var result gin.H
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		panic(err)
+	}
+
+	questions, err := u.userService.GetQuestionByUserId(id)
+	if err != nil {
+		panic(err)
+	} else {
+		result = gin.H{
+			"result": questions,
+		}
+	}
+
+	c.JSON(http.StatusOK, result)
 }

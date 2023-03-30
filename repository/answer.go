@@ -41,10 +41,10 @@ func (a *answerRepository) GetAnswer() ([]entity.Answer, error) {
 		err := data.Scan(
 			&answer.ID,
 			&answer.Answer,
-			&answer.User_role,
 			&answer.Created_at,
 			&answer.Updated_at,
-			&answer.Task_id,
+			&answer.User_role,
+			&answer.Question_id,
 			&answer.User_id,
 		)
 
@@ -59,7 +59,7 @@ func (a *answerRepository) GetAnswer() ([]entity.Answer, error) {
 
 func (a *answerRepository) InsertAnswer(answer entity.Answer) (entity.Answer, error) {
 	sql := `
-	INSERT INTO answer (answer, user_role, created_at, updated_at, task_id, user_id)
+	INSERT INTO answer (answer, created_at, updated_at,  user_role, question_id, user_id)
 	VALUES ($1, $2, $3, $4, $5, $6)
 	RETURNING *
 	`
@@ -67,18 +67,18 @@ func (a *answerRepository) InsertAnswer(answer entity.Answer) (entity.Answer, er
 	err := a.db.QueryRow(
 		sql,
 		&answer.Answer,
-		&answer.User_role,
 		&answer.Created_at,
 		&answer.Updated_at,
-		&answer.Task_id,
+		&answer.User_role,
+		&answer.Question_id,
 		&answer.User_id,
 	).Scan(
 		&answer.ID,
 		&answer.Answer,
-		&answer.User_role,
 		&answer.Created_at,
 		&answer.Updated_at,
-		&answer.Task_id,
+		&answer.User_role,
+		&answer.Question_id,
 		&answer.User_id,
 	)
 
@@ -116,10 +116,10 @@ func (a *answerRepository) UpdateAnswer(answer entity.Answer) (entity.Answer, er
 	).Scan(
 		&answer.ID,
 		&answer.Answer,
-		&answer.User_role,
 		&answer.Created_at,
 		&answer.Updated_at,
-		&answer.Task_id,
+		&answer.User_role,
+		&answer.Question_id,
 		&answer.User_id,
 	)
 
@@ -146,10 +146,10 @@ func (a *answerRepository) GetAnswerById(id int) (entity.Answer, error) {
 	err := a.db.QueryRow(sql, id).Scan(
 		&result.ID,
 		&result.Answer,
-		&result.User_role,
 		&result.Created_at,
 		&result.Updated_at,
-		&result.Task_id,
+		&result.User_role,
+		&result.Question_id,
 		&result.User_id,
 	)
 

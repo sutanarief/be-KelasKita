@@ -2,6 +2,7 @@ package controller
 
 import (
 	"be-kelaskita/entity"
+	"be-kelaskita/helper"
 	"be-kelaskita/service"
 	"net/http"
 	"strconv"
@@ -45,7 +46,8 @@ func (cl *classHandler) InsertClass(c *gin.Context) {
 	newClass, err := cl.classService.InsertClass(inputClass)
 
 	if err != nil {
-		panic(err)
+		helper.ErrorHandler(err, c)
+		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
@@ -109,6 +111,25 @@ func (cl *classHandler) GetUserByClassId(c *gin.Context) {
 	} else {
 		result = gin.H{
 			"result": users,
+		}
+	}
+
+	c.JSON(http.StatusOK, result)
+}
+
+func (cl *classHandler) GetQuestionByClassId(c *gin.Context) {
+	var result gin.H
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		panic(err)
+	}
+
+	questions, err := cl.classService.GetQuestionByClassId(id)
+	if err != nil {
+		panic(err)
+	} else {
+		result = gin.H{
+			"result": questions,
 		}
 	}
 

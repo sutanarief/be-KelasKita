@@ -60,9 +60,17 @@ func acccessValidator(c *gin.Context, tokenString string, db *sql.DB) (string, b
 	role := data["user_role"].(string)
 
 	if strings.Contains(string(path), "class") {
-		if method == "POST" || method == "DELETE" {
+		if method == "POST" || method == "DELETE" || method == "PUT" {
 			if role != "Teacher" {
-				return "Student cannot create or delete a class", false
+				return "Student cannot create, delete, or edit a class", false
+			}
+		}
+	}
+
+	if strings.Contains(string(path), "subject") {
+		if method == "POST" || method == "DELETE" || method == "PUT" {
+			if role != "Teacher" {
+				return "Student cannot create, delete, or edit a subject", false
 			}
 		}
 	}

@@ -17,6 +17,7 @@ type UserRepository interface {
 	DeleteUser(user entity.User) error
 	GetUserById(id int) (entity.User, error)
 	UserLogin(email string, username string) (entity.User, error)
+	GetQuestionByUserId(user entity.User) ([]entity.Question, error)
 }
 
 type userRepository struct {
@@ -30,7 +31,7 @@ func NewUserRepository(db *sql.DB) *userRepository {
 func (u *userRepository) GetUser() ([]entity.User, error) {
 	var result []entity.User
 
-	sql := "SELECT * FROM account"
+	sql := "SELECT * FROM account ORDER BY role DESC"
 	data, err := u.db.Query(sql)
 
 	if err != nil {
@@ -195,6 +196,40 @@ func (u *userRepository) UserLogin(email string, username string) (entity.User, 
 
 	if err != nil {
 		return result, err
+	}
+
+	return result, nil
+}
+
+func (u *userRepository) GetQuestionByUserId(user entity.User) ([]entity.Question, error) {
+	var result []entity.Question
+
+	sql := "SELECT * FROM question WHERE user_id = $1 ORDER BY created_at DESC"
+	data, err := u.db.Query(sql, user.ID)
+
+	if err != nil {
+		panic(err)
+	}
+
+	for data.Next() {
+		var question entity.Question
+
+		err := data.Scan(
+			&question.ID,
+			&question.Title,
+			&question.Question,
+			&question.Created_at,
+			&question.Updated_at,
+			&question.User_role,
+			&question.Class_id,
+			&question.User_id,
+			&question.Subject_id,
+		)
+
+		if err != nil {
+			panic(err)
+		}
+		result = append(result, question)
 	}
 
 	return result, nil

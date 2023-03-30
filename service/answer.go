@@ -39,7 +39,7 @@ func (a *answerService) InsertAnswer(inputAnswer entity.Answer) (entity.Answer, 
 	answer.User_role = inputAnswer.User_role
 	answer.Created_at = time.Now()
 	answer.Updated_at = time.Now()
-	answer.Task_id = inputAnswer.Task_id
+	answer.Question_id = inputAnswer.Question_id
 	answer.User_id = inputAnswer.User_id
 
 	newAnswer, err := a.answerRepository.InsertAnswer(answer)
@@ -59,7 +59,7 @@ func (a *answerService) UpdateAnswer(inputAnswer entity.Answer, id int) (entity.
 	answer.User_role = inputAnswer.User_role
 
 	answer.Updated_at = time.Now()
-	answer.Task_id = inputAnswer.Task_id
+	answer.Question_id = inputAnswer.Question_id
 	answer.User_id = inputAnswer.User_id
 
 	updatedAnswer, err := a.answerRepository.UpdateAnswer(answer)

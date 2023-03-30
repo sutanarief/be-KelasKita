@@ -15,6 +15,7 @@ type ClassRepository interface {
 	UpdateClass(inputclass entity.Class) (entity.Class, error)
 	DeleteClass(class entity.Class) error
 	GetUserByClassId(class entity.Class) ([]entity.User, error)
+	GetQuestionByClassId(class entity.Class) ([]entity.Question, error)
 }
 
 type classRepository struct {
@@ -161,6 +162,40 @@ func (c *classRepository) GetUserByClassId(class entity.Class) ([]entity.User, e
 			panic(err)
 		}
 		result = append(result, user)
+	}
+
+	return result, nil
+}
+
+func (c *classRepository) GetQuestionByClassId(class entity.Class) ([]entity.Question, error) {
+	var result []entity.Question
+
+	sql := "SELECT * FROM question WHERE class_id = $1 ORDER BY created_at DESC"
+	data, err := c.db.Query(sql, class.ID)
+
+	if err != nil {
+		panic(err)
+	}
+
+	for data.Next() {
+		var question entity.Question
+
+		err := data.Scan(
+			&question.ID,
+			&question.Title,
+			&question.Question,
+			&question.Created_at,
+			&question.Updated_at,
+			&question.User_role,
+			&question.Class_id,
+			&question.User_id,
+			&question.Subject_id,
+		)
+
+		if err != nil {
+			panic(err)
+		}
+		result = append(result, question)
 	}
 
 	return result, nil

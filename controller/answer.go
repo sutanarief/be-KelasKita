@@ -2,6 +2,7 @@ package controller
 
 import (
 	"be-kelaskita/entity"
+	"be-kelaskita/helper"
 	"be-kelaskita/service"
 	"net/http"
 	"strconv"
@@ -45,7 +46,8 @@ func (a *answerHandler) InsertAnswer(c *gin.Context) {
 	newAnswer, err := a.answerService.InsertAnswer(inputAnswer)
 
 	if err != nil {
-		panic(err)
+		helper.ErrorHandler(err, c)
+		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
@@ -104,7 +106,8 @@ func (a *answerHandler) GetAnswerById(c *gin.Context) {
 
 	answer, err := a.answerService.GetAnswerById(id)
 	if err != nil {
-		panic(err)
+		helper.ErrorHandler(err, c)
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{

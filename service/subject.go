@@ -11,6 +11,7 @@ type SubjectService interface {
 	InsertSubject(inputSubject entity.Subject) (entity.Subject, error)
 	UpdateSubject(inputSubject entity.Subject, id int) (entity.Subject, error)
 	DeleteSubject(id int) error
+	GetQuestionBySubjectId(id int) ([]entity.Question, error)
 }
 
 type subjectService struct {
@@ -21,22 +22,22 @@ func NewSubjectService(subjectRepository repository.SubjectRepository) *subjectS
 	return &subjectService{subjectRepository}
 }
 
-func (c *subjectService) GetSubject() ([]entity.Subject, error) {
-	subjects, err := c.subjectRepository.GetSubject()
+func (s *subjectService) GetSubject() ([]entity.Subject, error) {
+	subjects, err := s.subjectRepository.GetSubject()
 	if err != nil {
 		return subjects, err
 	}
 	return subjects, nil
 }
 
-func (c *subjectService) InsertSubject(inputSubject entity.Subject) (entity.Subject, error) {
+func (s *subjectService) InsertSubject(inputSubject entity.Subject) (entity.Subject, error) {
 	var subject entity.Subject
 
 	subject.Name = inputSubject.Name
 	subject.Created_at = time.Now()
 	subject.Updated_at = time.Now()
 
-	newSubject, err := c.subjectRepository.InsertSubject(subject)
+	newSubject, err := s.subjectRepository.InsertSubject(subject)
 
 	if err != nil {
 		return newSubject, err
@@ -45,7 +46,7 @@ func (c *subjectService) InsertSubject(inputSubject entity.Subject) (entity.Subj
 	return newSubject, nil
 }
 
-func (c *subjectService) UpdateSubject(inputSubject entity.Subject, id int) (entity.Subject, error) {
+func (s *subjectService) UpdateSubject(inputSubject entity.Subject, id int) (entity.Subject, error) {
 	var subject entity.Subject
 
 	subject.ID = id
@@ -54,7 +55,7 @@ func (c *subjectService) UpdateSubject(inputSubject entity.Subject, id int) (ent
 
 	subject.Updated_at = time.Now()
 
-	updatedSubject, err := c.subjectRepository.UpdateSubject(subject)
+	updatedSubject, err := s.subjectRepository.UpdateSubject(subject)
 	if err != nil {
 		return updatedSubject, err
 	}
@@ -62,13 +63,24 @@ func (c *subjectService) UpdateSubject(inputSubject entity.Subject, id int) (ent
 	return updatedSubject, nil
 }
 
-func (c *subjectService) DeleteSubject(id int) error {
+func (s *subjectService) DeleteSubject(id int) error {
 	var subject entity.Subject
 
 	subject.ID = id
-	err := c.subjectRepository.DeleteSubject(subject)
+	err := s.subjectRepository.DeleteSubject(subject)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (s *subjectService) GetQuestionBySubjectId(id int) ([]entity.Question, error) {
+	var subject entity.Subject
+
+	subject.ID = id
+	questions, err := s.subjectRepository.GetQuestionBySubjectId(subject)
+	if err != nil {
+		return questions, err
+	}
+	return questions, nil
 }

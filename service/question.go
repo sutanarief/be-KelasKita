@@ -12,6 +12,7 @@ type QuestionService interface {
 	UpdateQuestion(inputQuestion entity.Question, id int) (entity.Question, error)
 	DeleteQuestion(id int) error
 	GetQuestionById(id int) (entity.Question, error)
+	GetQuestionWithAnswer(id int) (entity.QuestionWithAns, error)
 }
 
 type questionService struct {
@@ -36,7 +37,7 @@ func (q *questionService) InsertQuestion(inputQuestion entity.Question) (entity.
 	var question entity.Question
 
 	question.Title = inputQuestion.Title
-	question.Description = inputQuestion.Description
+	question.Question = inputQuestion.Question
 	question.User_role = inputQuestion.User_role
 	question.Created_at = time.Now()
 	question.Updated_at = time.Now()
@@ -58,7 +59,7 @@ func (q *questionService) UpdateQuestion(inputQuestion entity.Question, id int) 
 	question.ID = id
 
 	question.Title = inputQuestion.Title
-	question.Description = inputQuestion.Description
+	question.Question = inputQuestion.Question
 	question.User_role = inputQuestion.User_role
 
 	question.Updated_at = time.Now()
@@ -87,6 +88,16 @@ func (q *questionService) DeleteQuestion(id int) error {
 
 func (q *questionService) GetQuestionById(id int) (entity.Question, error) {
 	question, err := q.questionRepository.GetQuestionById(id)
+
+	if err != nil {
+		return question, err
+	}
+
+	return question, nil
+}
+
+func (q *questionService) GetQuestionWithAnswer(id int) (entity.QuestionWithAns, error) {
+	question, err := q.questionRepository.GetQuestionWithAnswer(id)
 
 	if err != nil {
 		return question, err

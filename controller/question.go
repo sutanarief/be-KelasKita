@@ -2,6 +2,7 @@ package controller
 
 import (
 	"be-kelaskita/entity"
+	"be-kelaskita/helper"
 	"be-kelaskita/service"
 	"net/http"
 	"strconv"
@@ -45,7 +46,8 @@ func (q *questionHandler) InsertQuestion(c *gin.Context) {
 	newQuestions, err := q.questionService.InsertQuestion(inputQuestion)
 
 	if err != nil {
-		panic(err)
+		helper.ErrorHandler(err, c)
+		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
@@ -71,7 +73,7 @@ func (q *questionHandler) UpdateQuestion(c *gin.Context) {
 	question, err := q.questionService.UpdateQuestion(inputQuestion, id)
 
 	if err != nil {
-		panic(err)
+		helper.ErrorHandler(err, c)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -104,7 +106,25 @@ func (q *questionHandler) GetQuestionById(c *gin.Context) {
 
 	question, err := q.questionService.GetQuestionById(id)
 	if err != nil {
+		helper.ErrorHandler(err, c)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"result": question,
+	})
+}
+
+func (q *questionHandler) GetQuestionWithAnswer(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
 		panic(err)
+	}
+
+	question, err := q.questionService.GetQuestionWithAnswer(id)
+	if err != nil {
+		helper.ErrorHandler(err, c)
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
