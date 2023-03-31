@@ -1,7 +1,8 @@
 # KelasKita
 <!--- These are examples. See https://shields.io for others or to customize this set of shields. You might want to include dependencies, project status and licence info here --->
-![GitHub repo size](https://img.shields.io/github/repo-size/sutanarief/be-KelasKita)
-![GitHub contributors](https://img.shields.io/github/contributors/sutanarief/be-KelasKita)
+![GitHub repo size](https://img.shields.io/github/repo-size/sutanarief/be-KelasKita?style=plastic)
+![Github languange](https://img.shields.io/github/languages/top/sutanarief/be-KelasKita?logo=go&style=plastic)
+![GitHub contributors](https://img.shields.io/github/contributors/sutanarief/be-KelasKita?style=plastic)
 ![GitHub stars](https://img.shields.io/github/stars/sutanarief/be-KelasKita?style=social)
 ![GitHub forks](https://img.shields.io/github/forks/sutanarief/be-KelasKita?style=social)
 
